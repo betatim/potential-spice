@@ -30,15 +30,21 @@ j.splitter = SplitByFiles(filesPerJob=1)
 j.name = jobs(old).name
 j.comment = "Input from job %i"%(old)
 
-if len(jobs(old).subjobs) == 0:
-    j.inputdata = jobs(old).outputfiles
-else:
+if input_lfns:
     j.inputdata = []
-    for osj in jobs(old).subjobs.select(status='completed'):
-        for f in osj.outputfiles:
-            if isinstance(f, DiracFile):
-                if f.lfn:
-                    j.inputdata.extend([LogicalFile(f.lfn)])
+    logicals = [LogicalFile(l[5:-1]) for l in input_lfns]
+    j.inputdata.extend(logicals)
+
+else:
+    if len(jobs(old).subjobs) == 0:
+        j.inputdata = jobs(old).outputfiles
+    else:
+        j.inputdata = []
+        for osj in jobs(old).subjobs.select(status='completed'):
+            for f in osj.outputfiles:
+                if isinstance(f, DiracFile):
+                    if f.lfn:
+                        j.inputdata.extend([LogicalFile(f.lfn)])
 
 j.prepare()
 j.submit()

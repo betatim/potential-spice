@@ -4,11 +4,11 @@ import sys
 from GaudiConf import IOHelper
 from Configurables import LHCbApp, ApplicationMgr, DataOnDemandSvc
 from Configurables import SimConf, DigiConf, DecodeRawEvent
-from Configurables import CondDB, DstConf, PhysConf
-from Configurables import LoKiSvc, DecayTreeTuple
+from Configurables import CondDB
+from Configurables import LoKiSvc#, DecayTreeTuple
 from Configurables import CombineParticles, FilterDesktop
 from PhysSelPython.Wrappers import Selection, AutomaticData, SelectionSequence
-
+from DecayTreeTuple.Configuration import *
 
 
 # Configure all the unpacking, algorithms, tags and input files
@@ -60,12 +60,49 @@ jpsi_seq = SelectionSequence("SeqMyJPsi", TopSelection=filter_jpsi_sel)
 dtt = DecayTreeTuple("Early2015")
 dtt.Inputs = [jpsi_seq.outputLocation()]
 # Overwriting default list of TupleTools
+# XXX need to add TisTosTool with sensible lines
 dtt.ToolList = ["TupleToolKinematic",
                 "TupleToolPid"]
 dtt.Decay = "J/psi(1S) -> ^mu- ^mu+"
+dtt.addBranches({"X": "^(J/psi(1S) -> mu- mu+)",
+                 "muplus": "J/psi(1S) -> mu- ^mu+",
+                 "muminus": "J/psi(1S) -> ^mu- mu+",
+                 })
+
+x_preamble = ["DZ = VFASPF(VZ) - BPV(VZ)",
+              ]
+x_vars = {"ETA": "ETA",
+          "Y": "Y",
+          "PHI": "PHI",
+          "VPCHI2": "VFASPF(VPCHI2)",
+          "DELTAZ": "DZ",
+          # DZ * M / PZ / c with c in units of mm/s
+          # XXX should this be the PDG mass or measured mass?
+          #"TZ": "DZ*M / PZ / 299792458000.0", #seconds
+          "TZ": "DZ*3096.916 / PZ/299792458000.0*(10**12)", #ps
+          "minpt": "MINTREE('mu+' == ABSID, PT)",
+          "minclonedist": "MINTREE(ISBASIC & HASTRACK, CLONEDIST)",
+          "maxtrchi2dof": "MAXTREE(ISBASIC & HASTRACK, TRCHI2DOF)",
+          }
+muon_vars = {"ETA": "ETA",
+             "Y": "Y",
+             "PHI": "PHI",
+             "CLONEDIST": "CLONEDIST",
+             "TRCHI2DOF": "TRCHI2DOF",
+             }
+
+loki_X = dtt.X.addTupleTool("LoKi::Hybrid::TupleTool/LoKi_X")
+loki_X.Variables = x_vars
+loki_X.Preambulo = x_preamble
+
+loki_mup = dtt.muplus.addTupleTool("LoKi::Hybrid::TupleTool/LoKi_MuPlus")
+loki_mup.Variables = muon_vars
+loki_mum = dtt.muminus.addTupleTool("LoKi::Hybrid::TupleTool/LoKi_MuMinus")
+loki_mum.Variables = muon_vars
 
 dv.UserAlgorithms = [jpsi_seq.sequence(), dtt]
 dv.TupleFile = "DVNtuples.root"
 
-inputFiles = ["/tmp/thead/early/%i.xdst"%(n) for n in range(4)]
+#inputFiles = ["/tmp/thead/early/%i.xdst"%(n) for n in range(35)]
+inputFiles = ["/tmp/thead/early/%i.xdst"%(n) for n in range(5)]
 IOHelper('ROOT').inputFiles(inputFiles)
