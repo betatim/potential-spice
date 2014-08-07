@@ -1,0 +1,13 @@
+*.py[cod~]
+
+# C extensions
+*.so
+
+# ROOT files
+*.root
+
+# Various file types created by the simulation
+*.sim
+*.digi
+*.dst
+*.xdst
