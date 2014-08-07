@@ -3,20 +3,20 @@ import random
 import re
 import os
 import inspect
-import os
 
 import ROOT as R
 
 
 local_dir = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
 
-# Variables lsited here are copied to the sub-ntuple
+# Variables listed here are copied to the sub-ntuple
 # allows you to rename them, or compute new variables
-# via TTreeFormulas
-fit_variables = [("X_M", "X_M"),
-                 ("X_PT", "X_PT"),
-                 ("X_Y", "X_Y"),
-                 ("X_TZ", "X_TZ"),
+# via TTreeFormulas, but you have to give them a new
+# name in that case
+fit_variables = [("x_M", "X_M/1000"), # convert to GeV
+                 ("x_PT", "X_PT/1000"), # convert to GeV
+                 ("x_Y", "X_Y"),
+                 ("x_TZ", "X_TZ"),
                  ("RAND", random.random),
                  ]
 datasets = {"JPsi_data": {'in_file': local_dir + "/../data/JPsi_data_ntuple.root",
