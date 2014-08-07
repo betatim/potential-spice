@@ -7,5 +7,5 @@ fitting/%_sub.root: data/%_ntuple.root fitting/create_subtree.py
 
 # Collect the ganga output
 collect_ntuples: data/JPsi_mc_ntuple.root data/JPsi_data_ntuple.root
-data/%_ntuple.root:
+data/%_ntuple.root: data/get_data.py
 	python data/get_data.py $*

@@ -11,6 +11,22 @@ def pimp_my_roofit():
         return self.getSize()
     R.RooArgSet.__iter__ = argset__iter__
     R.RooArgSet.__len__ = argset__len__
+
+def plot_inv_mass(pdf, dataset, var, components, base_name="InvMass-"):
+    c = R.TCanvas()
+    plot1 = var.frame(RF.Title(var.GetName()),
+                      RF.Name("J/Psi Mass [GeV]"))
+    dataset.plotOn(plot1)
+    pdf.plotOn(plot1)
+    for component,(style,colour) in components.iteritems():
+        pdf.plotOn(plot1,
+                   RF.Components(component),
+                   RF.LineStyle(style),
+                   RF.LineColor(colour))
+
+    plot1.Draw()
+    c.Update()
+    c.SaveAs(base_name + var.GetName() +".pdf")
     
 def draw_likelihood_curves(pdf, dataset, fit_result, base_name="NLL-"):
     """Draw likelihood curve for all variables"""

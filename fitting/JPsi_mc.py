@@ -5,6 +5,7 @@ from pprint import pprint
 import ROOT as R
 from ROOT import RooFit as RF
 
+import shapes
 import utils
 utils.pimp_my_roofit()
 
@@ -48,6 +49,7 @@ variables = ["Signal_mean[2.999,2.990,3.210]",
              "Signal_sigma2[0.012,0,0.2]",
              "Signal_alpharight[-0.5,-3,0]",
              "Signal_nright[2,0,10]",
+             "Signal_frac[0.5,0,1]",
              ]
 # as well as all constants
 constants = []
@@ -55,40 +57,18 @@ for v in variables + constants:
     w.factory(v)
 
 name = "Signal"
-var = "x_M"
-cb_one = ("CBShape:{name}{name}1({var},"
-          " {name}_mean, {name}_sigma1, {name}_alphaleft,"
-          " {name}_nleft)".format(name=name, var=var))
-w.factory(cb_one)
-cb_two = ("CBShape:{name}{name}2({var},"
-          " {name}_mean, {name}_sigma2, {name}_alpharight,"
-          " {name}_nright)".format(name=name, var=var))
-w.factory(cb_two)
-
-sig_pdf = w.factory("SUM:{name}{name}({name}{name}_frac[0.5,0,1]*{name}{name}1,"
-                    "{name}{name}2)".format(name=name))
+sig_pdf = shapes.signal(w, name)
 
 r = sig_pdf.fitTo(dataset, RF.Save(True),
                   RF.Minimizer("Minuit2", "Migrad"),
                   RF.NumCPU(1))
 
-components = {"{name}{name}1".format(name=name): (RF.kSolid, R.kRed),
-              "{name}{name}2".format(name=name): (RF.kDashed, R.kOrange),
+components = {name+"1": (RF.kSolid, R.kRed),
+              name+"2": (RF.kDashed, R.kOrange),
               }
-
-c = R.TCanvas()
-plot1 = x_M.frame(RF.Title("x_M"),
-                   RF.Name("J/Psi Mass [GeV]"))
-dataset.plotOn(plot1)
-sig_pdf.plotOn(plot1)
-for component,(style,colour) in components.iteritems():
-    sig_pdf.plotOn(plot1,
-                   RF.Components(component),
-                   RF.LineStyle(style),
-                   RF.LineColor(colour))
-
-plot1.Draw()
-c.Update()
+utils.plot_inv_mass(sig_pdf, dataset,
+                    x_M, components,
+                    "SigOnlyFit-")
 
 #utils.draw_likelihood_curves(sig_pdf, dataset, r)
 

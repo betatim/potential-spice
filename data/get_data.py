@@ -10,7 +10,7 @@ ganga_job_dir = "~/gj/"
 # Currently use incl_b and incl_c as "data"
 # the J/Psi signal MC is privately produced
 datasets = {"JPsi_data": "{562,563,567,566}/*/output/DVNtuples.root",
-            "JPsi_mc": "540/*/output/DVNtuples.root",
+            "JPsi_mc": "569/*/output/DVNtuples.root",
             }
 
 if __name__ == "__main__":
