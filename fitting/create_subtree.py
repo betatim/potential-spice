@@ -17,6 +17,7 @@ fit_variables = [("X_M", "X_M"),
                  ("X_PT", "X_PT"),
                  ("X_Y", "X_Y"),
                  ("X_TZ", "X_TZ"),
+                 ("RAND", random.random),
                  ]
 datasets = {"JPsi_data": {'in_file': local_dir + "/../data/JPsi_data_nTuple.root",
                           'out_file': local_dir + "/JPsi_data_sub.root",
@@ -50,7 +51,8 @@ def create_tree(ds):
 
     print "Using dataset %s with cuts: %s"%(ds, config['cuts'])
 
-    random.seed(112)
+    # One seed for every data set
+    random.seed(ds)
 
     inFile = R.TFile(config['in_file'], "READ")
 
@@ -67,7 +69,8 @@ def create_tree(ds):
     # calculation of the final branches
     enable_branches(inTree, extract_names(config['cuts']))
     for _,old in config['rename']:
-        enable_branches(inTree, extract_names(old), exclusive=False)
+        if isinstance(old, str):
+            enable_branches(inTree, extract_names(old), exclusive=False)
 
     print "Applying initial cuts"
     tree = inTree.CopyTree(config['cuts'])
@@ -84,10 +87,17 @@ def create_tree(ds):
     new_branches = {}
     for (new, old) in config['rename']:
         br = tree.Branch(new, AddressOf(s, new), new + "/F")
-        new_branches[new] = (R.TTreeFormula("fr_"+new,
-                                            old,
-                                            tree),
-                             br)
+        if isinstance(old, str):
+            new_branches[new] = (R.TTreeFormula("fr_"+new,
+                                                old,
+                                                tree),
+                                 br)
+
+        else:
+            # old is really a misnomer here, it is the
+            # function to call to create the value for
+            # this branch
+            new_branches[new] = (old, br)
 
     print "Looping over all events"
     for i in xrange(total):
@@ -96,7 +106,12 @@ def create_tree(ds):
             
         tree.GetEntry(i)
         for name, (formula,br) in new_branches.iteritems():
-            setattr(s, name, formula.EvalInstance(0))
+            if isinstance(formula, R.TTreeFormula):
+                setattr(s, name, formula.EvalInstance(0))
+
+            else:
+                setattr(s, name, formula())
+                
             br.Fill()
 
     # By enabling only the new/renamed branches we get rid
