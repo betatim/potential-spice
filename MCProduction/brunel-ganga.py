@@ -1,8 +1,10 @@
 from Ganga.GPI import *
 import sys
+import inspect
+import os
 
 
-local_dir= "/afs/cern.ch/user/t/thead/w/private/early2015/MCProduction/"
+local_dir = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
 
 if len(sys.argv) not in (2,3):
     sys.exit("Script requires the id of the boole job to use as inputdata and optionally a file containing LFNs to process.")

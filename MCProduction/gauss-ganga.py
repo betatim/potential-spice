@@ -1,8 +1,10 @@
 from Ganga.GPI import *
 import sys
+import inspect
+import os
 
 
-local_dir= "/afs/cern.ch/user/t/thead/w/private/early2015/MCProduction/"
+local_dir = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
 
 if len(sys.argv) is not 2:
   sys.exit("Error, needs one argument, the event type to use.")
