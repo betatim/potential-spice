@@ -21,7 +21,7 @@ if __name__ == "__main__":
         sys.exit(1)
     
     input_pattern = datasets[ds_name]
-    args = " -f /tmp/%s_nTuple.root %s/%s"%(ds_name,
+    args = " -f /tmp/%s_ntuple.root %s/%s"%(ds_name,
                                             ganga_job_dir,
                                             input_pattern)
     print "Running: hadd %s"%(args)
@@ -36,10 +36,10 @@ if __name__ == "__main__":
         print >>sys.stderr, "Execution failed:", e
         sys.exit(1)
 
-    final_name = "%s/%s_nTuple.root"%(local_dir, ds_name)
+    final_name = "%s/%s_ntuple.root"%(local_dir, ds_name)
     if os.path.exists(final_name):
         print "%s already exists, to replace it: delete it first and re-run this script"%(final_name)
-        os.remove("/tmp/%s_nTuple.root"%(ds_name))
+        os.remove("/tmp/%s_ntuple.root"%(ds_name))
         sys.exit(1)
         
-    shutil.move("/tmp/%s_nTuple.root"%ds_name,  final_name)
+    shutil.move("/tmp/%s_ntuple.root"%ds_name,  final_name)
