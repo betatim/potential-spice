@@ -75,8 +75,8 @@ r = pdf.fitTo(dataset,
 components = {"Signal": (RF.kSolid, R.kRed),
               "Background": (RF.kDashed, R.kOrange),
               }
-utils.plot_inv_mass(pdf,
-                    dataset,
-                    x_M,
-                    components,
-                    "MCDataFit-")
+#utils.plot_inv_mass(pdf,
+#                    dataset,
+#                    x_M,
+#                    components,
+#                    "MCDataFit-")
