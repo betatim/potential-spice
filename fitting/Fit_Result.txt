@@ -1,0 +1,17 @@
+  Background_0_bin_in_Y__0_bin_in_PT_tau   [   -0.5000  +/-      0.0361]  ||| limits: [   -0.5000     0.5000]
+  Background_0_bin_in_Y__1_bin_in_PT_tau   [   -0.4999  +/-      0.7219]  ||| limits: [   -0.5000     0.5000]
+  Background_1_bin_in_Y__0_bin_in_PT_tau   [   -0.5000  +/-      0.1550]  ||| limits: [   -0.5000     0.5000]
+  Background_1_bin_in_Y__1_bin_in_PT_tau   [   -0.5000  +/-      0.5885]  ||| limits: [   -0.5000     0.5000]
+          Ncombi_0_bin_in_Y__0_bin_in_PT   [ 2003.0081  +/-     52.9289]  ||| limits: [    0.0000  4000.0000]
+          Ncombi_0_bin_in_Y__1_bin_in_PT   [    2.5783  +/-      2.7197]  ||| limits: [    0.0000  4000.0000]
+          Ncombi_1_bin_in_Y__0_bin_in_PT   [  484.3744  +/-     27.2047]  ||| limits: [    0.0000  4000.0000]
+          Ncombi_1_bin_in_Y__1_bin_in_PT   [    0.0174  +/-     22.9781]  ||| limits: [    0.0000  4000.0000]
+            Nsig_0_bin_in_Y__0_bin_in_PT   [ 1540.6120  +/-     48.3799]  ||| limits: [    0.0000  5000.0000]
+            Nsig_0_bin_in_Y__1_bin_in_PT   [   35.4141  +/-      6.3475]  ||| limits: [    0.0000  5000.0000]
+            Nsig_1_bin_in_Y__0_bin_in_PT   [  761.6999  +/-     31.8842]  ||| limits: [    0.0000  5000.0000]
+            Nsig_1_bin_in_Y__1_bin_in_PT   [    6.9687  +/-      3.7082]  ||| limits: [    0.0000  5000.0000]
+     Signal_0_bin_in_Y__0_bin_in_PT_mean   [    3.0960  +/-      0.0004]  ||| limits: [    2.9900     3.2100]
+     Signal_0_bin_in_Y__1_bin_in_PT_mean   [    3.0975  +/-      0.0026]  ||| limits: [    2.9900     3.2100]
+     Signal_1_bin_in_Y__0_bin_in_PT_mean   [    3.0968  +/-      0.0006]  ||| limits: [    2.9900     3.2100]
+
+Fit status: 3
