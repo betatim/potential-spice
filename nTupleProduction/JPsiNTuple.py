@@ -70,7 +70,9 @@ CHILDCUT(2, HASMUON & ISMUON) &
     # Overwriting default list of TupleTools
     # XXX need to add TisTosTool with sensible lines
     dtt.ToolList = ["TupleToolKinematic",
-                    "TupleToolPid"]
+                    "TupleToolPid",
+                    "TupleToolMCBackgroundInfo",
+                    ]
     dtt.Decay = mark(2, mark(3, decay_descriptor)) #"J/psi(1S) -> ^mu- ^mu+"
     dtt.addBranches({"X": "^(%s)"%(decay_descriptor),
                      "muplus": mark(3, decay_descriptor),#"J/psi(1S) -> mu- ^mu+",
