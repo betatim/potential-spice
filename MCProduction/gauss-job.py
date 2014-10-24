@@ -14,7 +14,7 @@ def execute(event_type):
     LHCbApp().Simulation = True
     LHCbApp().DDDBtag = "dddb-20130929-1"
     LHCbApp().CondDBtag = "sim-20131023-vc-md100"
-    LHCbApp().EvtMax = 11
+    LHCbApp().EvtMax = 3
     
     GaussGen = GenInit("GaussGen")
     #GaussGen.FirstEventNumber = 1
@@ -23,5 +23,6 @@ def execute(event_type):
     #HistogramPersistencySvc().OutputFile = outpath+'-GaussHistos.root'
     OutputStream("GaussTape").Output = "DATAFILE='PFN:EarlyEvents.sim' TYP='POOL_ROOTTREE' OPT='RECREATE'"
 
-incl_JPsi = 24142001
-execute(incl_JPsi)
+#incl_JPsi = 24142001
+#incl_Upsilons = 18112004
+#execute(incl_Upsilons)
