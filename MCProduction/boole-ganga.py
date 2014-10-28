@@ -20,15 +20,18 @@ if len(sys.argv) == 3:
 if jobs(old).application.__class__ is not Gauss:
     sys.exit("The given job is not a Gauss job.")
 
-j = Job(application=Boole(version="v28r2p1",
-                          optsfile=local_dir + "boole-job.py",
+j = Job(application=Boole(version="v29r0",
+                          optsfile=local_dir + "/boole-job.py",
                           extraopts="""\nexecute()\n""",
                           )
         )
 
-j.outputfiles = [DiracFile("*.digi")]
+j.outputfiles = [DiracFile("*.digi"),
+                 DiracFile("*.xdigi")]
 j.backend = Dirac()
-j.splitter = SplitByFiles(filesPerJob=1)
+
+j.splitter = SplitByFiles(filesPerJob=2)
+
 j.name = jobs(old).name
 j.comment = "Input from job %i"%(old)
 
