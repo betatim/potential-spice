@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no" ?>
+<!-- Edited By POOL -->
+<!DOCTYPE POOLFILECATALOG SYSTEM "InMemory">
+<POOLFILECATALOG>
+  <File ID="382F283A-2963-E411-AE71-02163E00A6E5">
+    <physical>
+      <pfn filetype="ROOT" name="/tmp/ikomarov/Rewrited.dst"/>
+    </physical>
+    <logical/>
+  </File>
+
+  <File ID="881A8E81-3B63-E411-B04B-02163E00A6E5">
+    <physical>
+      <pfn filetype="ROOT" name="/tmp/ikomarov/With_new_L0.dst"/>
+    </physical>
+    <logical/>
+  </File>
+
+  <File ID="48E702B5-4263-E411-9C87-02163E00A6E5">
+    <physical>
+      <pfn filetype="ROOT" name="/tmp/ikomarov/With_new_HLT.dst"/>
+    </physical>
+    <logical/>
+  </File>
+
+  <File ID="1CAACCAE-5663-E411-9A7F-02163E00A5BB">
+    <physical>
+      <pfn filetype="ROOT" name="/tmp/ikomarov/Turbo.dst"/>
+    </physical>
+    <logical/>
+  </File>
+
+</POOLFILECATALOG>

@@ -1,0 +1,11 @@
+Ds, evt = seekForData('/Event/Leptonic/Phys/MicroDSTDiMuonJpsi2MuMuLine/Particles')
+Ds
+for d in Ds:
+    print d
+evt
+for k in evt:
+    print evt
+ok, evt = seekStripDecision('.*Line.*' )
+ok, evt = seekStripDecision('.*Line.*' )ok, evt = seekStripDecision('.*Line.*' )
+ok, evt = seekStripDecision('.*Line.*' )
+.q
