@@ -7,7 +7,7 @@ import os
 local_dir = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
 
 if len(sys.argv) not in (2,3):
-    sys.exit("Script requires the id of the gauss job to use as inputdata and optionally name of a file containing LFNs to process.")
+    sys.exit("Script requires the id of a Boole job to use as inputdata and optionally name of a file containing LFNs to process.")
 
 old = int(sys.argv[1])
 input_lfns = []
@@ -17,20 +17,20 @@ if len(sys.argv) == 3:
         input_lfns.append(line.strip())
     f.close()
 
-if jobs(old).application.__class__ is not Gauss:
-    sys.exit("The given job is not a Gauss job.")
+if jobs(old).application.__class__ is not Boole:
+    sys.exit("The given job is not a Boole job.")
 
-j = Job(application=Boole(version="v29r0",
-                          optsfile=local_dir + "/boole-job.py",
+j = Job(application=Moore(version="v22r1p1",
+                          optsfile=local_dir + "/l0app-job.py",
                           extraopts="""\nexecute()\n""",
                           )
         )
 
-j.outputfiles = [DiracFile("*.digi"),
-                 DiracFile("*.xdigi")]
+j.outputfiles = [DiracFile("*.dst"),
+                 DiracFile("*.xdst")]
 j.backend = Dirac()
 
-j.splitter = SplitByFiles(filesPerJob=4)
+j.splitter = SplitByFiles(filesPerJob=1)
 
 j.name = jobs(old).name
 j.comment = "Input from job %i"%(old)
@@ -52,4 +52,5 @@ else:
                         j.inputdata.extend([LogicalFile(f.lfn)])
 
 j.prepare()
-j.submit()
+#j.submit()
+queues.add(j.submit)

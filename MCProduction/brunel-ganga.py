@@ -7,7 +7,7 @@ import os
 local_dir = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
 
 if len(sys.argv) not in (2,3):
-    sys.exit("Script requires the id of the boole job to use as inputdata and optionally a file containing LFNs to process.")
+    sys.exit("Script requires the id of the boole or moore job to use as inputdata and optionally a file containing LFNs to process.")
   
 old = int(sys.argv[1])
 input_lfns = []
@@ -17,17 +17,16 @@ if len(sys.argv) == 3:
         input_lfns.append(line.strip())
     f.close()
 
-if jobs(old).application.__class__ is not Boole:
+if jobs(old).application.__class__ not in (Boole, Moore):
     sys.exit("The given job is not a Boole job.")
 
-j = Job(application=Brunel(version="v46r1",
-                           optsfile=local_dir+"brunel-job.py",
+j = Job(application=Brunel(version="v47r1",
+                           optsfile=local_dir+"/brunel-job.py",
                            extraopts="\nexecute()\n",
                            )
         )
 
 j.backend = Dirac()
-j.backend.diracOpts = 'ReplicateUserOutputData=False'
 j.splitter = SplitByFiles(filesPerJob=1)
 j.name = jobs(old).name
 j.comment = "Input from job %i"%(old)
@@ -50,4 +49,4 @@ else:
                         j.inputdata.extend([LogicalFile(f.lfn)])
 
 j.prepare()
-j.submit()
+queues.add(j.submit)

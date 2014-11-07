@@ -18,7 +18,7 @@ def execute(event_type):
     
     GaussGen = GenInit("GaussGen")
     #GaussGen.FirstEventNumber = 1
-    GaussGen.RunNumber = 96787
+    GaussGen.RunNumber = 383589
     
     #HistogramPersistencySvc().OutputFile = outpath+'-GaussHistos.root'
     OutputStream("GaussTape").Output = "DATAFILE='PFN:EarlyEvents.sim' TYP='POOL_ROOTTREE' OPT='RECREATE'"
