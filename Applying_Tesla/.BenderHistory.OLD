@@ -1,0 +1,29 @@
+ok, evt = seekStripDecision('.*Lam.*' )
+ok, evt = seekStripDecision('.*Muon.*' )
+ls()
+ls('/Event')
+ls('/EventMuon')
+ls('/Event/Muon')
+ls('/Event/Other')
+ls('/Event/Strip')
+ls('/Event/Strip/pPhys')
+ls('/Event/Strip/pPhys/DecReports')
+a = get('/Event/Strip/pPhys/DecReports')
+print a
+for k in a:
+print a
+for k in a:
+    print k
+ls('/Event/Strip/Phys/')
+ls('/Event/Strip/Phys')
+ls('/Event/GEn')
+ls('/Event/Gen')
+ls('/Event/Gen/Header')
+ls('/Event/Gen/Collisions')
+ls()
+run(1)
+ls()
+ls-l()
+ls('/Event/Strip')
+ls('/Event/Strip/pPhys')
+ls('/Event/Strip/pPhys/DecReports')

@@ -1,0 +1,3 @@
+Scripts in this folder allows to get nTuples from Tesla and stripping canididates in single file.
+Basically, you need to repeat all steps from Tesla tutorial. Pay attention, that you should properly modify your input/output files in all scripts.
+Have fun!
