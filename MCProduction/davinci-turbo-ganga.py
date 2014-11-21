@@ -20,7 +20,7 @@ if len(sys.argv) == 3:
 if jobs(old).application.__class__ is not DaVinci:
     sys.exit("The given job is not a DaVinci job.")
 
-j = Job(application=DaVinci(version="v36r0",
+j = Job(application=DaVinci(version="v36r2",
                             optsfile=local_dir + "/davinci-turbo-job.py",
                             extraopts="""\nexecute()\n""",
                             user_release_area=local_dir +"/../cmtuser/",

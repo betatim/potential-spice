@@ -38,6 +38,7 @@ def execute(simulation=True,
                     "TupleToolMCBackgroundInfo",
                     "TupleToolMCTruth",
                     "MCTupleToolHierarchy",
+                    #"MCTupleToolPID",
                     "TupleToolGeometry",
                     "TupleToolTISTOS",
                     "TupleToolTrackInfo",
@@ -59,18 +60,42 @@ def execute(simulation=True,
     dtt.TupleToolTISTOS.Verbose = True
     dtt.TupleToolTISTOS.TriggerList = tlist
 
+    from Configurables import TupleToolMCTruth, MCTupleToolHierarchy
+    dtt.addTool(TupleToolMCBackgroundInfo,
+                name="TupleToolMCBackgroundInfo")
+    dtt.TupleToolMCBackgroundInfo.Verbose = True
+    dtt.addTool(MCTupleToolHierarchy,
+                name="MCTupleToolHierarchy")
+    dtt.addTool(TupleToolMCTruth,
+                name="TupleToolMCTruth")
+    
     from TeslaTools import TeslaTruthUtils
-    assoc_seq = TeslaTruthUtils.associateSequence("Tesla",False)
+    from Configurables import TrackAssociator, ChargedPP2MC
+    from Configurables import PatLHCbID2MCParticle
+    assoc_seq = TeslaTruthUtils.associateSequence("Tesla", False)
+
+    assoc_seq.Members.insert(0, PatLHCbID2MCParticle())
+
+    from Configurables import MuonCoord2MCParticleLink
+    muon_coords = MuonCoord2MCParticleLink("TeslaMuonCoordLinker")
+    assoc_seq.Members.insert(1, muon_coords)
+    
+    #TrackAssociator("TeslaAssocTr").OutputLevel = 1
+    TrackAssociator("TeslaAssocTr").DecideUsingMuons = True
+    #ChargedPP2MC("TeslaProtoAssocPP").OutputLevel = 1
+    
     relations = TeslaTruthUtils.getRelLoc("Tesla")
     TeslaTruthUtils.makeTruth(dtt,
                               relations,
                               ["MCTupleToolKinematic",
                                "MCTupleToolHierarchy",
-                               "MCTupleToolPID" ])
-    dtt.addTool(TupleToolMCBackgroundInfo, name="TupleToolMCBackgroundInfo")
-    dtt.TupleToolMCBackgroundInfo.Verbose = True
+                               "MCTupleToolPID",
+                               ]
+                              )
+
     
     dtt.Decay = mark(2, mark(3, decay_descriptor)) #"J/psi(1S) -> ^mu- ^mu+"
+    
     dtt.addBranches({"X": "^(%s)"%(decay_descriptor),
                      "muplus": mark(3, decay_descriptor),#"J/psi(1S) -> mu- ^mu+",
                      "muminus": mark(2, decay_descriptor),#"J/psi(1S) -> ^mu- mu+",
@@ -108,6 +133,12 @@ def execute(simulation=True,
     loki_mum = dtt.muminus.addTupleTool("LoKi::Hybrid::TupleTool/LoKi_MuMinus")
     loki_mum.Variables = muon_vars
     
-    dv.UserAlgorithms = [asoc_seq, dtt]
+
+    dv.UserAlgorithms = [assoc_seq, dtt]
     dv.TupleFile = "DVNtuples.root"
-    
+
+
+#import GaudiPython as GP
+#inputFiles = ["/tmp/thead/EarlyEvents-Extended-L0-Turbo.xdst"]
+#IOHelper('ROOT').inputFiles(inputFiles) 
+#execute()
