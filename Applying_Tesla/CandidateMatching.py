@@ -4,6 +4,7 @@ from pprint import pprint
 from itertools import product
 import math
 import numpy as n
+import sys
 
 import ROOT as R
 from ROOT import gStyle
@@ -26,53 +27,44 @@ t_Stripping = tree_Stripping.Get("DecayTree")
 nEntries = t_Tesla.GetEntries() 
 
 t_events = []
-detailed_events = []
+detailed_events = {}
 common_events = []
 verified = []
 list_of_differences = {}
 
-#Difference in components of a momentum. MeV
-diff = 0
-verified_mup = 0
-verified_mum = 0
-for s in t_Stripping:
+
+NumOfOverlap = 0
+
+for i,s in enumerate(t_Stripping):
     if [s.runNumber, s.eventNumber] not in t_events:
         t_events.append([s.runNumber, s.eventNumber])
-    detailed_events.append({'ID':[s.runNumber, s.eventNumber], 'muplus':[s.muplus_PX,s.muplus_PY,s.muplus_PZ],'muminus':[s.muminus_PX,s.muminus_PY,s.muminus_PZ]})
-for s in t_Tesla:
+        detailed_events[str(s.runNumber)+str(s.eventNumber)]=[]
+    detailed_events[str(s.runNumber)+str(s.eventNumber)].append({'muplus':[s.muplus_PX,s.muplus_PY,s.muplus_PZ],'muminus':[s.muminus_PX,s.muminus_PY,s.muminus_PZ]})
+    sys.stdout.flush()
+    sys.stdout.write('Stripping candidates :'+str(i+1)+'/'+ str(t_Stripping.GetEntries())+'\r')
+print ""
+print 'Striping candidates done'
+for i, s in enumerate(t_Tesla):
     if [s.runNumber, s.eventNumber] in t_events:
-        #print "checking "+str(s.runNumber)+"  "+str(s.eventNumber)
-        muplus_check = 0
-        muminus_check = 0
+        #NumOfOverlap - dummy counter
+        NumOfOverlap+=1
         index = 0
-        for d in detailed_events:
-            if d['ID']== [s.runNumber, s.eventNumber]:
-                difference = (s.muplus_PX-d['muplus'][0])**2+ (s.muplus_PY-d['muplus'][1])**2+(s.muplus_PZ-d['muplus'][2])**2 + (s.muminus_PX-d['muminus'][0])**2+ (s.muminus_PY-d['muminus'][1])**2+(s.muminus_PZ-d['muminus'][2])**2
-                #Find for pair for mu+ and mu-
-                if (s.muplus_PX-d['muplus'][0])**2+ (s.muplus_PY-d['muplus'][1])**2+(s.muplus_PZ-d['muplus'][2])**2<=diff**2:
-                    muplus_check=1
-                    verified_mup +=1
-                if (s.muminus_PX-d['muminus'][0])**2+ (s.muminus_PY-d['muminus'][1])**2+(s.muminus_PZ-d['muminus'][2])**2<=diff**2:
-                    muminus_check=1
-                    verified_mum +=1
-                #Find most similar candidate
-                if index == 0:
-                    min_difference = difference
-                index +=1
-                if difference<min_difference:
-                    min_difference = difference
-                #Check if identical candidate found
-                if (muplus_check==1) and (muminus_check==1):
-                    #verified.append({'ID':[s.runNumber, s.eventNumber],"muplus_check":muplus_check,"muminus_check":muminus_check})
-                    verified.append([s.runNumber, s.eventNumber])
-                    continue
-                muplus_check == 0
-                muminus_check == 0
-        list_of_differences[str(s.runNumber)+str(s.eventNumber)] = min_difference
+        #Here can be several candidates in the same event, so we want to find the most similar Stripping candidate for each Tesla candidte
+        for d in detailed_events[str(s.runNumber)+str(s.eventNumber)]:
+            difference = (s.muplus_PX-d['muplus'][0])**2+ (s.muplus_PY-d['muplus'][1])**2+(s.muplus_PZ-d['muplus'][2])**2 + (s.muminus_PX-d['muminus'][0])**2+ (s.muminus_PY-d['muminus'][1])**2+(s.muminus_PZ-d['muminus'][2])**2
+            if index == 0:
+                min_difference = difference
+            index +=1
+            if difference<min_difference:
+                min_difference = difference
+        list_of_differences[str(s.runNumber)+str(s.eventNumber)+str(s.J_psi_1S_M)] = min_difference
 
-print str(int(100*len(verified)/nEntries))+"% of Tesla candidates have stripping partner"
-print str(int(100*verified_mup/nEntries))+"% of mu+ have stripping partner"
-print str(int(100*verified_mum/nEntries))+"% of mu- candidates have stripping partner"
+    sys.stdout.flush()
+    sys.stdout.write('Tesla candidates :'+str(i+1)+'/'+ str(t_Tesla.GetEntries())+'\r')
+
+print ""
+print 'Tesla candidates done'
+print "Dummy matching counting:  "+str(NumOfOverlap)+" Advanced matching counting:  "+str(len(list_of_differences.keys()))
 
 
 
@@ -91,16 +83,11 @@ br = t.Branch('verified', verified, 'verified/D')
 
 for t in t:
     #print "Filling event " + str(t.runNumber) + "  " + str(t.eventNumber)
-    if str(t.runNumber)+str(t.eventNumber) in list_of_differences:
-        verified[0] = list_of_differences[str(t.runNumber)+str(t.eventNumber)]
+    if str(t.runNumber)+str(t.eventNumber)+str(t.J_psi_1S_M) in list_of_differences:
+        verified[0] = list_of_differences[str(t.runNumber)+str(t.eventNumber)+str(t.J_psi_1S_M)]
     else:
         verified[0] = -1000
     br.Fill()
-
-
-#TTree *T = new TTree(...)
-#TFile *f = new TFile(...)
-
 
 new_f.Write()
 new_f.Close()
