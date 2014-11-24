@@ -7,7 +7,7 @@ import os
 local_dir = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
 
 if len(sys.argv) not in (2,3):
-    sys.exit("Script requires the id of a Moore (HLT) job to use as inputdata and optionally name of a file containing LFNs to process.")
+    sys.exit("Script requires the id of a Moore (HLT) or Brunel job to use as inputdata and optionally name of a file containing LFNs to process.")
 
 old = int(sys.argv[1])
 input_lfns = []
@@ -17,8 +17,8 @@ if len(sys.argv) == 3:
         input_lfns.append(line.strip())
     f.close()
 
-if jobs(old).application.__class__ is not Moore:
-    sys.exit("The given job is not a Moore job.")
+if jobs(old).application.__class__ not in (Moore, Brunel):
+    sys.exit("The given job is not a Moore or Brunel job.")
 
 j = Job(application=DaVinci(version="v36r0",
                             optsfile=local_dir + "/turbo-job.py",
