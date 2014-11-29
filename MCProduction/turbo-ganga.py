@@ -20,7 +20,7 @@ if len(sys.argv) == 3:
 if jobs(old).application.__class__ not in (Moore, Brunel):
     sys.exit("The given job is not a Moore or Brunel job.")
 
-j = Job(application=DaVinci(version="v36r0",
+j = Job(application=DaVinci(version="v36r2",
                             optsfile=local_dir + "/turbo-job.py",
                             extraopts="""\nexecute()\n""",
                             user_release_area=local_dir +"/../cmtuser/",
@@ -35,6 +35,8 @@ j.splitter = SplitByFiles(filesPerJob=1)
 
 j.name = jobs(old).name
 j.comment = "Turbo with input from job %i"%(old)
+
+j.inputsandbox.append(local_dir + "/tcks/config.tar")
 
 if input_lfns:
     j.inputdata = []

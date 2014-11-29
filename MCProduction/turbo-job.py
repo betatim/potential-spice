@@ -8,8 +8,8 @@ def execute():
     RecombineRawEvent()
     DecodeRawEvent().DataOnDemand = True
 
-    #from Configurables import ConfigTarFileAccessSvc
-    #ConfigTarFileAccessSvc().File='/afs/cern.ch/work/s/sbenson/public/forTeslaExtendedReps/config.tar'
+    from Configurables import ConfigTarFileAccessSvc
+    ConfigTarFileAccessSvc().File = "config.tar"
 
     #Tesla().OutputLevel = DEBUG
     Tesla().TriggerLine = "Hlt2DiMuonJPsi"
@@ -21,3 +21,6 @@ def execute():
     #ioh.setupServices()
     #ioh.inputFiles(["EarlyEvents-Extended-L0-Turbo.xdst"])
     Tesla().outputFile = "EarlyEvents-Extended-L0-Turbo.xdst"
+
+    #from Configurables import TeslaReportAlgo
+    #TeslaReportAlgo().OutputLevel = 1

@@ -7,7 +7,7 @@ import os
 local_dir = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
 
 if len(sys.argv) not in (2,3):
-    sys.exit("Script requires the id of a Boole job to use as inputdata and optionally name of a file containing LFNs to process.")
+    sys.exit("Script requires the id of a Boole or Moore job to use as inputdata and optionally name of a file containing LFNs to process.")
 
 old = int(sys.argv[1])
 input_lfns = []
@@ -17,10 +17,10 @@ if len(sys.argv) == 3:
         input_lfns.append(line.strip())
     f.close()
 
-if jobs(old).application.__class__ is not Boole:
-    sys.exit("The given job is not a Boole job.")
+if jobs(old).application.__class__ not in (Boole, Moore):
+    sys.exit("The given job is not a Boole or Moore job.")
 
-j = Job(application=Moore(version="v22r1p1",
+j = Job(application=Moore(version="v23r2",
                           optsfile=local_dir + "/l0app-job.py",
                           extraopts="""\nexecute()\n""",
                           )
@@ -33,7 +33,7 @@ j.backend = Dirac()
 j.splitter = SplitByFiles(filesPerJob=1)
 
 j.name = jobs(old).name
-j.comment = "Input from job %i"%(old)
+j.comment = "L0 input from job %i"%(old)
 
 if input_lfns:
     j.inputdata = []

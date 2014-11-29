@@ -1,4 +1,4 @@
-# SetupProject Moore v22r1p1
+# SetupProject Moore v23r2
 import sys
 from Moore.Configuration import *
 from Configurables import L0App

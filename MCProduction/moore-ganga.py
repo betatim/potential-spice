@@ -20,7 +20,7 @@ if len(sys.argv) == 3:
 if jobs(old).application.__class__ is not Moore:
     sys.exit("The given job is not a Moore job.")
 
-j = Job(application=Moore(version="v22r1p1",
+j = Job(application=Moore(version="v23r2",
                           optsfile=local_dir + "/moore-job.py",
                           extraopts="""\nexecute()\n""",
                           user_release_area=local_dir +"/../cmtuser/",
@@ -35,6 +35,8 @@ j.splitter = SplitByFiles(filesPerJob=1)
 
 j.name = jobs(old).name
 j.comment = "HLT with input from job %i"%(old)
+
+j.inputsandbox.append(local_dir + "/tcks/config.tar")
 
 if input_lfns:
     j.inputdata = []
