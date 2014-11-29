@@ -36,6 +36,8 @@ j.splitter = SplitByFiles(filesPerJob=1)
 j.name = jobs(old).name
 j.comment = "DaVinci (turbo) with input from job %i"%(old)
 
+j.inputsandbox.append(local_dir + "/tcks/config.tar")
+
 if input_lfns:
     j.inputdata = []
     logicals = [LogicalFile(l[5:-1]) for l in input_lfns]

@@ -1,9 +1,10 @@
-# SetupProject DaVinci v36r0
+# SetupProject DaVinci v36r2
 import sys
 
 from GaudiConf import IOHelper
 from Configurables import LHCbApp, ApplicationMgr, DataOnDemandSvc
 from Configurables import SimConf, DigiConf, DecodeRawEvent
+from Configurables import ConfigTarFileAccessSvc
 from Configurables import CondDB, DaVinci
 from Configurables import LoKiSvc
 from DecayTreeTuple.Configuration import *
@@ -22,6 +23,8 @@ def execute(simulation=True,
     # Configure all the unpacking, algorithms, tags and input files
     appConf = ApplicationMgr()
     appConf.ExtSvc+= ['ToolSvc', 'DataOnDemandSvc', LoKiSvc()]
+
+    ConfigTarFileAccessSvc().File = 'config.tar'
     
     dv = DaVinci()
     dv.DataType = "2012"
@@ -37,9 +40,9 @@ def execute(simulation=True,
                     "TupleToolPid",
                     "TupleToolMCBackgroundInfo",
                     "TupleToolMCTruth",
-                    "MCTupleToolHierarchy",
+                    #"MCTupleToolHierarchy",
                     #"MCTupleToolPID",
-                    "TupleToolGeometry",
+                    #"TupleToolGeometry",
                     "TupleToolTISTOS",
                     "TupleToolTrackInfo",
                     "TupleToolTrigger",
@@ -80,9 +83,7 @@ def execute(simulation=True,
     muon_coords = MuonCoord2MCParticleLink("TeslaMuonCoordLinker")
     assoc_seq.Members.insert(1, muon_coords)
     
-    #TrackAssociator("TeslaAssocTr").OutputLevel = 1
     TrackAssociator("TeslaAssocTr").DecideUsingMuons = True
-    #ChargedPP2MC("TeslaProtoAssocPP").OutputLevel = 1
     
     relations = TeslaTruthUtils.getRelLoc("Tesla")
     TeslaTruthUtils.makeTruth(dtt,
@@ -130,8 +131,11 @@ def execute(simulation=True,
     
     loki_mup = dtt.muplus.addTupleTool("LoKi::Hybrid::TupleTool/LoKi_MuPlus")
     loki_mup.Variables = muon_vars
+    #dtt.muplus.addTupleTool("TupleToolGeometry")
+    
     loki_mum = dtt.muminus.addTupleTool("LoKi::Hybrid::TupleTool/LoKi_MuMinus")
     loki_mum.Variables = muon_vars
+    #dtt.muminus.addTupleTool("TupleToolGeometry")
     
 
     dv.UserAlgorithms = [assoc_seq, dtt]
