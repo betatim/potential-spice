@@ -7,10 +7,16 @@ from Configurables import SimConf, DigiConf, DecodeRawEvent
 from Configurables import ConfigTarFileAccessSvc
 from Configurables import CondDB, DaVinci
 from Configurables import LoKiSvc
-from DecayTreeTuple.Configuration import *
 from Configurables import TupleToolTrigger
 from Configurables import TupleToolTISTOS
 from Configurables import TupleToolMCBackgroundInfo
+from Configurables import CombineParticles, FilterDesktop
+from Configurables import TrackAssociator, ChargedPP2MC
+from Configurables import PatLHCbID2MCParticle
+from TeslaTools import TeslaTruthUtils
+        
+from PhysSelPython.Wrappers import Selection, AutomaticData, SelectionSequence
+from DecayTreeTuple.Configuration import *
 
 
 def mark(idx, decay_descriptor):
@@ -19,6 +25,7 @@ def mark(idx, decay_descriptor):
     return " ".join(parts)
 
 def execute(simulation=True,
+            turbo=True,
             decay_descriptor="J/psi(1S) -> mu- mu+"):
     # Configure all the unpacking, algorithms, tags and input files
     appConf = ApplicationMgr()
@@ -34,17 +41,73 @@ def execute(simulation=True,
     CondDB().Upgrade = False
     
     dtt = DecayTreeTuple("Early2015")
-    dtt.Inputs = ["/Event/Tesla/Particles"]
+    if turbo:
+        tesla_prefix = "Hlt2DiMuonJPsi"
+        dtt.Inputs = ["/Event/"+tesla_prefix+"/Particles"]
+        dtt.InputPrimaryVertices = "/Event/"+tesla_prefix+"/Primary"
+        dtt.WriteP2PVRelations = False
+
+    else:
+        LHCbApp().DDDBtag = "dddb-20140729"
+        polarity = "u"
+        LHCbApp().CondDBtag = "sim-20140730-vc-m%s100"%polarity
+        muons = AutomaticData(Location="Phys/StdAllLooseMuons/Particles")
+
+        jpsi = CombineParticles('MyJPsi')
+        jpsi.DecayDescriptors = [decay_descriptor]
+        jpsi.CombinationCut = "(AM < 7100.0 *GeV)"
+        jpsi.DaughtersCuts = {"": "ALL", "mu+": "ALL", "mu-": "ALL"}
+        jpsi.MotherCut = "(VFASPF(VCHI2/VDOF) < 999999.0)"
+        
+        code = """
+('J/psi(1S)' == ID) &
+in_range(2.990*GeV, M, 3.210*GeV) &
+DECTREE('%s') &
+CHILDCUT(1, HASMUON & ISMUON) &
+CHILDCUT(2, HASMUON & ISMUON) &
+(MINTREE('mu+' == ABSID, PT) > 700*MeV) &
+(MAXTREE(ISBASIC & HASTRACK, TRCHI2DOF) < 5) &
+(MINTREE(ISBASIC & HASTRACK, CLONEDIST) > 5000) &
+(VFASPF(VPCHI2) > 0.5/100) &
+(abs(BPV(VZ)) <  0.5*meter) &
+(BPV(vrho2) < (10*mm)**2)
+"""%(decay_descriptor)
+        # similar to the HLT2 line
+        code = """
+(ADMASS('J/psi(1S)')< 120*MeV) &
+DECTREE('%s') &
+(PT>0*MeV) &
+(MAXTREE('mu-'==ABSID,TRCHI2DOF) < 4) &
+(MINTREE('mu-'==ABSID,PT)> 0*MeV) &
+(VFASPF(VCHI2PDOF)< 25)
+"""%(decay_descriptor)
+        filter_jpsi = FilterDesktop("MyFilterJPsi",
+                                    Code=code,
+                                    Preambulo=["vrho2 = VX**2 + VY**2"],
+                                    ReFitPVs=True,
+                                    #IgnoreP2PVFromInputLocations=True,
+                                    #WriteP2PVRelations=True
+                                    )
+        
+        jpsi_sel = Selection("SelMyJPsi", Algorithm=jpsi, RequiredSelections=[muons])
+        filter_jpsi_sel = Selection("SelFilterMyJPsi",
+                                    Algorithm=filter_jpsi,
+                                    RequiredSelections=[jpsi_sel])
+        jpsi_seq = SelectionSequence("SeqMyJPsi", TopSelection=filter_jpsi_sel)
+        dtt.Inputs = [jpsi_seq.outputLocation()]
+    
     # Overwriting default list of TupleTools
     dtt.ToolList = ["TupleToolKinematic",
                     "TupleToolPid",
+                    "TupleToolEventInfo",
                     "TupleToolMCBackgroundInfo",
                     "TupleToolMCTruth",
                     #"MCTupleToolHierarchy",
                     #"MCTupleToolPID",
-                    #"TupleToolGeometry",
+                    "TupleToolGeometry",
                     "TupleToolTISTOS",
-                    "TupleToolTrackInfo",
+                    # with turbo this crashes
+                    #"TupleToolTrackInfo",
                     "TupleToolTrigger",
                     ]
     tlist = ["L0HadronDecision", "L0MuonDecision",
@@ -69,23 +132,29 @@ def execute(simulation=True,
     dtt.TupleToolMCBackgroundInfo.Verbose = True
     dtt.addTool(MCTupleToolHierarchy,
                 name="MCTupleToolHierarchy")
+    dtt.MCTupleToolHierarchy.Verbose = True
     dtt.addTool(TupleToolMCTruth,
                 name="TupleToolMCTruth")
-    
-    from TeslaTools import TeslaTruthUtils
-    from Configurables import TrackAssociator, ChargedPP2MC
-    from Configurables import PatLHCbID2MCParticle
-    assoc_seq = TeslaTruthUtils.associateSequence("Tesla", False)
+    dtt.TupleToolMCTruth.Verbose = True
 
-    assoc_seq.Members.insert(0, PatLHCbID2MCParticle())
+    if turbo:
+        assoc_seq = TeslaTruthUtils.associateSequence(tesla_prefix, False)
+        ChargedPP2MC(tesla_prefix+"ProtoAssocPP").OutputLevel = 1
+        
+        assoc_seq.Members.insert(0, PatLHCbID2MCParticle())
 
-    from Configurables import MuonCoord2MCParticleLink
-    muon_coords = MuonCoord2MCParticleLink("TeslaMuonCoordLinker")
-    assoc_seq.Members.insert(1, muon_coords)
+        from Configurables import MuonCoord2MCParticleLink
+        muon_coords = MuonCoord2MCParticleLink("TeslaMuonCoordLinker")
+        assoc_seq.Members.insert(1, muon_coords)
     
-    TrackAssociator("TeslaAssocTr").DecideUsingMuons = True
-    
-    relations = TeslaTruthUtils.getRelLoc("Tesla")
+        TrackAssociator("TeslaAssocTr").DecideUsingMuons = True
+        
+        relations = TeslaTruthUtils.getRelLoc(tesla_prefix)
+
+    else:
+        relations = "Relations/Rec/ProtoP/Charged"
+
+
     TeslaTruthUtils.makeTruth(dtt,
                               relations,
                               ["MCTupleToolKinematic",
@@ -93,7 +162,7 @@ def execute(simulation=True,
                                "MCTupleToolPID",
                                ]
                               )
-
+    
     
     dtt.Decay = mark(2, mark(3, decay_descriptor)) #"J/psi(1S) -> ^mu- ^mu+"
     
@@ -137,10 +206,14 @@ def execute(simulation=True,
     loki_mum.Variables = muon_vars
     #dtt.muminus.addTupleTool("TupleToolGeometry")
     
-
-    dv.UserAlgorithms = [assoc_seq, dtt]
     dv.TupleFile = "DVNtuples.root"
+    if turbo:
+        dv.UserAlgorithms = [assoc_seq, dtt]
 
+    else:
+        assocpp = ChargedPP2MC("TimsChargedPP2MC")
+        assocpp.OutputLevel = 1
+        dv.UserAlgorithms = [jpsi_seq.sequence(), assocpp, dtt]
 
 #import GaudiPython as GP
 #inputFiles = ["/tmp/thead/EarlyEvents-Extended-L0-Turbo.xdst"]

@@ -4,7 +4,7 @@ from Configurables import Brunel, LHCbApp
 from GaudiConf import IOHelper
 
 
-def execute():
+def execute(polarity):
     option_files = "$APPCONFIGOPTS/Brunel/DataType-2015.py;$APPCONFIGOPTS/Brunel/MC-WithTruth.py;$APPCONFIGOPTS/Persistency/Compression-ZLIB-1.py"
     option_files = option_files.split(";")
     for option in option_files:
@@ -14,7 +14,7 @@ def execute():
     
     LHCbApp().Simulation = True
     LHCbApp().DDDBtag = "dddb-20140729"
-    LHCbApp().CondDBtag = "sim-20140730-vc-mu100"
+    LHCbApp().CondDBtag = "sim-20140730-vc-m%s100"%polarity
 
     Brunel().DatasetName = "EarlyEvents-Extended-L0-Turbo-Moore-Brunel"
     HistogramPersistencySvc().OutputFile = 'EarlyEvents-BrunelHistos.root'

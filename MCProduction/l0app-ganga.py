@@ -6,13 +6,14 @@ import os
 
 local_dir = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
 
-if len(sys.argv) not in (2,3):
-    sys.exit("Script requires the id of a Boole or Moore job to use as inputdata and optionally name of a file containing LFNs to process.")
+if len(sys.argv) not in (3,4):
+    sys.exit("Script requires the id of a Boole or Moore job to use as inputdata, magnet polarity and optionally name of a file containing LFNs to process.")
 
 old = int(sys.argv[1])
+polarity = str(sys.argv[2])
 input_lfns = []
-if len(sys.argv) == 3:
-    f = open(sys.argv[2])
+if len(sys.argv) == 4:
+    f = open(sys.argv[3])
     for line in f:
         input_lfns.append(line.strip())
     f.close()
@@ -22,7 +23,7 @@ if jobs(old).application.__class__ not in (Boole, Moore):
 
 j = Job(application=Moore(version="v23r2",
                           optsfile=local_dir + "/l0app-job.py",
-                          extraopts="""\nexecute()\n""",
+                          extraopts="""\nexecute("%s")\n"""%polarity,
                           )
         )
 

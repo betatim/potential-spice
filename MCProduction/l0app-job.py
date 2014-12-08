@@ -6,7 +6,7 @@ from Configurables import LHCbApp
 from GaudiConf import IOHelper
 
 
-def execute():
+def execute(polarity):
     option_files = "$APPCONFIGOPTS/L0App/L0AppSimProduction.py;$APPCONFIGOPTS/L0App/L0AppTCK-0x0033.py;$APPCONFIGOPTS/L0App/DataType-2012.py"
     option_files = option_files.split(";")
     for option in option_files:
@@ -14,7 +14,7 @@ def execute():
 
     LHCbApp().Simulation = True
     LHCbApp().DDDBtag = "dddb-20140729"
-    LHCbApp().CondDBtag = "sim-20140730-vc-mu100"
+    LHCbApp().CondDBtag = "sim-20140730-vc-m%s100"%polarity
 
     #inputFiles = ["EarlyEvents-Extended.digi"]
     #IOHelper('ROOT').inputFiles(inputFiles)

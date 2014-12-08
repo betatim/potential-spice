@@ -8,7 +8,7 @@ from Configurables import HltConfigSvc
 from Configurables import ConfigTarFileAccessSvc
     
 
-def execute():
+def execute(polarity):
     option_files = "$APPCONFIGOPTS/Moore/MooreSimProductionForSeparateL0AppStep2015.py;$APPCONFIGOPTS/Conditions/TCK-0x40b10033.py;$APPCONFIGOPTS/Moore/DataType-2012.py"
     option_files = option_files.split(";")
     for option in option_files:
@@ -16,7 +16,7 @@ def execute():
 
     LHCbApp().Simulation = True
     LHCbApp().DDDBtag = "dddb-20140729"
-    LHCbApp().CondDBtag = "sim-20140730-vc-mu100"
+    LHCbApp().CondDBtag = "sim-20140730-vc-m%s100"%polarity
 
     #inputFiles = ["/tmp/thead/EarlyEvents-Extended-L0.xdst"]
     #IOHelper('ROOT').inputFiles(inputFiles)
