@@ -706,103 +706,17 @@ TH1F* tailHisto(TTree* theTree, double ptMin = 0, double ptMax = 20000, double e
 }  
 
 
-/*  
-void tzmatt(TTree* theTree, TCanvas* can, int pad, std::string ptMin = "0", std::string ptMax = "20000", std::string etaMin = "0", 
-	    std::string etaMax = "10", bool addParam = false){
 
- 
-  std::string cutString = ptBranch + ">"  + ptMin  + "&&" + ptBranch + "<" +ptMax  + "&&"+ etaBranch  + ">" + etaMin + "&&" + etaBranch + "<" + etaMax +                          bString ; 
- 
-  
-  // the phase space for the measurement
-  RooRealVar m("m","m",minmass, maxmass);  
-  RooRealVar p("p","p",0, 500e3);  
-  RooRealVar pt(ptBranch.c_str(),ptBranch.c_str(),0 , 100e3);  
-  RooRealVar y("y","y",0, 10);  
-  RooRealVar tz2("tz2","tz2",-10, 10);  
-  RooRealVar etz2("etz2", "etz2", 0, 1);
-
-  // the cuts 
-  std::cout << " get data " << std::endl;
-  TCut theCut = cutString.c_str(); 
-  RooDataSet data("data","data",RooArgSet(m,p,pt,y,tz2,etz2),Import(*theTree),Cut(theCut)) ;
-  int ntot = data.numEntries();
-  std::cout << "Selected " << ntot << std::endl;
-
-  
-  // error histo
-  TH1F* ehisto = tzerrHisto(theTree,cutString) ;
-  RooDataHist* bkg_ehist = new RooDataHist("bkg_ehist","bkg_ehist",etz2,ehisto);  
-  RooHistPdf bkg_epdf("bkg_pdf","bkg_pdf",etz2,*bkg_ehist) ;
- 
-  // the tail histo
-  TH1F* tail = tailHisto(theTree);
-  RooDataHist* tail_hist = new RooDataHist("tail_hist","tail_hist", tz2,tail);  
-  RooHistPdf tail_pdf("tail_pdf","tail_pdf",tz2,*tail_hist) ;
-  RooPlot* frame = tz2.frame() ;
-  
-  // the resolution model
-  RooRealVar SBack("Sback","Sback",1.0,  0,  1); SBack.setConstant(1);    
-  RooRealVar *bkg_mean = new RooRealVar("bkg_mean","bias bkg",0,  -2, 2); bkg_mean->setConstant(true);
-  RooResolutionModel* bkg_gauss =new RooGaussModel("bres","bres", tz2,*bkg_mean,  SBack, etz2 ); 
- 
-  // the background exponential
-  RooRealVar *bkg_taul = new RooRealVar("bkg_taul","bkg2_taul",1.2);
-  RooAbsPdf  *bkg_expl = new RooDecay("bkg_expl","bkg_expl", tz2, *bkg_taul, *bkg_gauss, RooDecay::SingleSided); 
-  RooProdPdf *bkgcon_l = new RooProdPdf("bkgcon_l","bkgcon_l", bkg_epdf , Conditional(*bkg_expl,tz2)) ;
-
-  // prompt use a delta function ?
-  RooTruthModel deltaFun("prompt","prompt",tz2);
-  RooRealVar *tau_prompt = new RooRealVar("tau_prompt","tau_prompt",0.1); 
-  RooProdPdf *bkg_promptcon = new RooProdPdf("bkg_promptcon","bkg_promptcon", bkg_epdf, Conditional(deltaFun,tz2)) ;
-
-  // tail function
-  RooProdPdf *tz_tailcon = new RooProdPdf("tz_tailcon","tz_tailcon", bkg_epdf, Conditional(tail_pdf,tz2)) ;
-
-  std::cout << " make the total pdf " << std::endl;
-
-  // full pdf
-  double fb1_guess = 0.9; 
-  RooRealVar *fb1 = new RooRealVar("fb1","fb1",fb1_guess,  0, 1);
-  RooRealVar *ftail = new RooRealVar("ftail","ftail", 0.01, 0, 1);
-  RooAbsPdf *bkg_tot = new RooAddPdf("bkg_tot","bkg_tot",RooArgList(*bkg_promptcon,*bkgcon_l,*tz_tailcon), RooArgList(*fb1, *ftail));
-  
-
-  std::cout << "Start the fit " << std::endl;
-    bkg_tot->fitTo(data);
-
-  RooPlot* frametz = tz2.frame() ;
-  frametz->SetTitle("");
- 
-  TAxis* xachse = frametz->GetXaxis(); TAxis* yachse = frametz->GetYaxis();
-  xachse->SetTitleFont (132);
-  yachse->SetTitleFont (132);
-  xachse->SetLabelFont (132);
-  yachse->SetLabelFont (132); 
-  xachse->SetTitle("tz [ps]"); 
-  yachse->SetTitle(" "); 
-
-
-  data.plotOn(frametz) ;
-  //  bkg_promptcon->plotOn(frametz);
-  bkg_tot->plotOn(frametz);
-  
-  frametz->SetMinimum(1);
-  frametz->Draw();
-
-}
-*/
-
-
-ResultTUB tzmatt(TTree* theTree, TCanvas* tCan, TCanvas* tCan3 ,  int pad, TH1F* tHisto,  std::string ptMin = "0", std::string ptMax = "20000", std::string etaMin = "0", 
-	    std::string etaMax = "10"){
+ResultTUB tzmatt(TTree* theTree, TCanvas* tCan, TCanvas* tCan3 ,
+                 int pad, TH1F* tHisto,  std::string ptMin = "0",
+                 std::string ptMax = "20000", std::string etaMin = "0", 
+                 std::string etaMax = "10"){
 
 
   ResultTUB timeResult;
  
-  std::string cutString = ptBranch + ">"  + ptMin  + "&&" + ptBranch + "<" +ptMax  + "&&"+ etaBranch  + ">" + etaMin + "&&" + etaBranch + "<" + etaMax +                          mString ; 
+  std::string cutString = ptBranch + ">"  + ptMin  + "&&" + ptBranch + "<" +ptMax  + "&&"+ etaBranch  + ">" + etaMin + "&&" + etaBranch + "<" + etaMax + mString ;
  
-
   stringstream ptminstream;  ptminstream << ptMin;
   double ptval; ptminstream >> ptval;
   
@@ -811,19 +725,20 @@ ResultTUB tzmatt(TTree* theTree, TCanvas* tCan, TCanvas* tCan3 ,  int pad, TH1F*
   
 
   // the phase space for the measurement
-  RooRealVar m("m","m",minmass, maxmass);  
-  RooRealVar p("p","p",0, 500e3);  
-  RooRealVar pt(ptBranch.c_str(),ptBranch.c_str(),0 , 100e3);  
-  RooRealVar y("y","y",0, 10);  
-  RooRealVar tz2("tz2","tz2",-10, 10);  
+  RooRealVar m(massBranch.c_str(), massBranch.c_str(), minmass, maxmass);  
+  RooRealVar p(pBranch.c_str(), pBranch.c_str(), 0, 500e3);  
+  RooRealVar pt(ptBranch.c_str(), ptBranch.c_str(),0 , 100e3);  
+  RooRealVar y(etaBranch.c_str(), etaBranch.c_str(), 0, 10);  
+  RooRealVar tz2("X_TZ","X_TZ",-10, 10);
   RooRealVar etz2("etz2", "etz2", 0, 1);
 
   // the cuts 
   std::cout << " get data " << std::endl;
   TCut theCut = cutString.c_str(); 
-  RooDataSet data("data","data",RooArgSet(m,p,pt,y,tz2,etz2),Import(*theTree),Cut(theCut)) ;
+  RooDataSet data("data", "data",
+                  RooArgSet(m,p,pt,y,tz2), Import(*theTree), Cut(theCut)) ;
   int ntot = data.numEntries();
-  std::cout << "Selected " << ntot << std::endl;
+  std::cout << "Selected3 " << ntot << std::endl;
 
   BResult bresult = binnedFit(theTree, ptMin, ptMax, etaMin, etaMax);
 
@@ -835,7 +750,7 @@ ResultTUB tzmatt(TTree* theTree, TCanvas* tCan, TCanvas* tCan3 ,  int pad, TH1F*
 
   // signal resolution model
   RooRealVar *bkg_mean = new RooRealVar("bkg_mean","bias bkg",-2e-3,  -0.015, 0.015); //bkg_mean->setConstant(true);
-  //  RooRealVar *sig_mean = new RooRealVar("sig_mean","bias bkg",0,  -0.1, 0.1); //sig_mean->setConstant(true);
+  
   double sig_guess_s1 =  0.05 ;
   double sig_guess_s2 =  0.09; 
   RooRealVar *sig_s1 = new RooRealVar("sig_s1","sig_s1",sig_guess_s1, 0.02, 0.08);
@@ -847,7 +762,6 @@ ResultTUB tzmatt(TTree* theTree, TCanvas* tCan, TCanvas* tCan3 ,  int pad, TH1F*
 
 
   //background resolution model [double gauss]
-  //  RooRealVar *bkg_mean = new RooRealVar("bkg_mean","bias bkg",0,  -0.05, 0.05); //bkg_mean->setConstant(true);
   double bkg_guess_s1 =  0.6e-02 ;
   double bkg_guess_s2 =  0.16; 
   RooRealVar *bkg_s1 = new RooRealVar("bkg_s1","bkg_s1",bkg_guess_s1, 0.001, 0.08);
@@ -855,7 +769,6 @@ ResultTUB tzmatt(TTree* theTree, TCanvas* tCan, TCanvas* tCan3 ,  int pad, TH1F*
   RooRealVar *beta1 = new RooRealVar("beta1","beta1",0.74,  0, 1);
   RooResolutionModel *res_b1 = new RooGaussModel("res_b1","gauss resolution model part 1", tz2,*bkg_mean,*bkg_s1);
   RooResolutionModel *res_b2 = new RooGaussModel("res_b2","gauss resolution model part 2", tz2,*bkg_mean,*bkg_s2);
-  //  RooAddModel *bkg_gauss = new RooAddModel("bkg_gauss","proper time for bkg gauss", RooArgList(*res_b1, *res_b2), RooArgList(*beta1) );
   RooAddModel *bkg_gauss = new RooAddModel("bkg_gauss","proper time for bkg gauss", RooArgList(*res_s1, *res_s2), RooArgList(*beta1) );
 
 
@@ -1052,10 +965,10 @@ ResultTUB tzmatt(TTree* theTree, TCanvas* tCan, TCanvas* tCan3 ,  int pad, TH1F*
 
 
 
-BackResult backfit(TTree* theTree, TCanvas* tCan,  int pad, TH1F* tHisto,  std::string ptMin = "0", std::string ptMax = "20000", std::string etaMin = "0", 
-	    std::string etaMax = "10"){
-
-
+BackResult backfit(TTree* theTree, TCanvas* tCan,
+                   int pad, TH1F* tHisto, std::string ptMin = "0",
+                   std::string ptMax = "20000", std::string etaMin = "0", 
+                   std::string etaMax = "10"){
   BackResult result;
 
   std::string cutString = ptBranch + ">"  + ptMin  + "&&" + ptBranch + "<" +ptMax  + "&&"+ etaBranch  + ">" + etaMin + "&&" + etaBranch + "<" + etaMax + bString ; 
